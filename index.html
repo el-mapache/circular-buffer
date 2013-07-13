@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head></head>
+<body>
+<script src='circular_buffer.js'></script>
+<script>
+  function testOutput(buffer) {
+    console.log('Return full buffer');
+  }
+  
+  function test(b) {
+    console.log('run test')
+    console.log('buffer type')
+    console.log(b)
+    var i = 0;
+    var start = Date.now(); 
+   
+    for(i;i<441000 * 200;i++) {
+      b.write(i);
+    }
+    var end = Date.now() - start;
+    console.log(end);
+    return true;
+  }
+  var cb = new SC.Buffers.CircularBuffer(441000,'Uint32Array')
+ console.log(test(cb))
+ // cb.clear()
+
+ var mb = new SC.Buffers.CircularMirroredBuffer(441000);
+
+ console.log(test(mb))
+SC.Buffers.CircularMirroredBuffer = function(size, callback,type) {
+      this.size = size
+      this.buff = []//new Uint32Array(441000);
+      this.start = 0;
+      this.end = 0;
+      this.sMSB = 0;
+      this.eMSB = 0;
+    };
+
+    SC.Buffers.CircularMirroredBuffer.prototype = {
+      full: function() {
+        return this.end === this.start && this.eMSB !== this.sMSB;
+      },
+
+      empty: function() {
+        return this.end === this.start && this.eMSB === this.sMSB
+      },
+
+      inc: function(pType, p, bType, msb) {
+        p = p + 1;
+        this[pType] = p
+        if(p === this.size) {
+          console.log(msb ^ 1);
+          this[bType] = msb ^ 1;
+          this[pType] = 0;
+        }
+      },
+
+      write: function(data) {
+        this.buff[this.end] = data;
+        if(this.full()) {
+          this.inc('start', this.start, 'sMSB', this.sMSB);
+        }
+        this.inc('end', this.end, 'eMSB', this.eMSB);
+      },
+
+      read: function() {
+        var elem = this.buff(this.start);
+        this.increment('start', this.start, 'sMSB', this.sMSB);
+
+        return elem;
+      }
+    };
+
+</script>
+</body>
+</html>
