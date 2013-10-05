@@ -6,8 +6,8 @@
   var root = window,
       CB = root.CB = root.CB || {};
 
-  // {@param size} Number total size of the buffer
-  // {@param type} String Type of array buffer to initilize the buffer with.
+  // {@param size} Number: total size of the buffer
+  // {@param type} String: type of array buffer to initilize the buffer with.
   CB.CircularBuffer = function(size, type) {
 
     // Leaves a single unallocated slot for differentiating between the start
@@ -21,23 +21,26 @@
   CB.CircularBuffer.constructor = CB.CircularBuffer;
   
   CB.CircularBuffer.prototype = {
+    // Reset the buffer to an empty array
     clear: function() {
       this.start = 0;
       this.end = 0;
-      return this.buff = [];
+      return this.buff.length = 0;
     },
 
     isEmpty: function() {
       return this.buff.length === 0;
     },
-
+    
     isFull: function() {
       return ((this.end + 1) % this.maxSize) === this.start;
     },
     
+    // Write to the tail of the buffer, and increment the end slot by one
     write: function(data) {
       this.buff[this.end] = data; 
       this.end = (this.end + 1) % this.maxSize;
+      
       if(this.start === this.end) {
         this.start = (this.start + 1) % this.maxSize;
       }
@@ -47,8 +50,10 @@
     read: function() {
       if(!this.isEmpty()) {
         var current = this.buff[this.start];
+        
         this.start = (this.start + 1) % this.maxSize;
       }
+      
       return current;
     },
     
