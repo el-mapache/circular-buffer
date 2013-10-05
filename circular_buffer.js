@@ -1,4 +1,4 @@
-/* Copyright (c) Adam Biagianit/el-mapache
+/* Copyright (c) Adam Biagianti/el-mapache
  * Super basic circular buffer implementation for javascript
  * MIT Licensed
  */
